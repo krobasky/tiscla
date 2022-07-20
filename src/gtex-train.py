@@ -129,12 +129,6 @@ def train(verbose=True):
     reduce = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=lr_patience) # xxx prolly not necessary for overtraining, 
     # where lr needs to be small anyway because converges quickly, but if so start learning at 0.01
 
-    '''
-    history = model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs, initial_epoch= 0, validation_data=(x_validation, y_validation),
-                              callbacks=[earlystop, reduce, checkpoint],
-                              verbose=True
-          )
-    '''
     train_data=tf.data.Dataset.from_tensor_slices((x_validation,y_validation))
     train_data=train_data.repeat().shuffle(100).batch(batch_size).prefetch(tf.data.AUTOTUNE)
     
@@ -161,20 +155,11 @@ def compare_predictions(x_test, y_test, y_pred):
 
 
 ####
-# TRAIN and EVALUATE
+# TRAIN, EVALUATE, and SAVE
 ####
 history=train(verbose=0)
 
 # check it trained ok
-import os
-os.makedirs("data/images")
-import matplotlib.pyplot as plt
-plt.figure(figsize=(5,5))
-plt.plot(history.history['loss'])
-plt.plot(history.history['accuracy'])
-plt.savefig('data/images/nn-loss-curve.png')
-
-
 print(f"Performance: ")
 performance = model.evaluate(x_test,y_test)
 print("Performance details: ")
@@ -191,6 +176,7 @@ print(f"False negatives:\t{performance[9]}")
 print(f"True positives:\t{performance[10]}")
 print(f"True negatives:\t{performance[11]}")
 
+# check predictions
 print("")
 y_pred = model.predict(x_test)
 print(f"Number of training samples: {len(y_train)}")
@@ -200,13 +186,17 @@ print("Mis-classifications:")
 print("(<truth>,<false-prediction>)")
 print(compare_predictions(x_test, y_test, y_pred))
 
-####
-# SAVE
-####
-model.save_weights("data/model/gtex/manual/weights_folder/weights")
-model.save('data/model/gtex/manual/gtex_model.h5')
+# plot and save the loss curve
+import os
+os.makedirs("data/images")
+import matplotlib.pyplot as plt
+plt.figure(figsize=(5,5))
+plt.plot(history.history['loss'])
+plt.plot(history.history['accuracy'])
+plt.savefig('data/images/nn-loss-curve.png')
 
-# check it saved ok
+# save and make sure it saved OK
+model.save('data/model/gtex/manual/gtex_model.h5')
 from keras.models import load_model
 savedModel=load_model('data/model/gtex/manual/gtex_model.h5')
 print("")
