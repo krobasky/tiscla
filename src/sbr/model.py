@@ -2,7 +2,7 @@ import os
 import tensorflow as tf
 from keras.models import load_model
 import numpy as np
-def save(model, model_path=None, file_name="model.h5", input_size=None, verbose=True):
+def save_architecture(model, model_path=None, file_name="model.h5", input_size=None, verbose=True):
     """
     Saves the given model to the given path and name. It's a good idea
     to train and then run this in a notebook if possible so the train

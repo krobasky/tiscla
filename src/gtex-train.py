@@ -54,11 +54,11 @@ history=fit.multicategorical_model(model=model,
 ####
 
 # sanity check fitting
-from sbr.evaluate import report
-performance = report(model, x_test, y_test, 
-                    sensitivityAtSpecificityThreshold=sensitivityAtSpecificityThreshold,
-                     specificityAtSensitivityThreshold=specificityAtSensitivityThreshold,
-                     verbose=True)
+from sbr.evaluate import training_report
+performance = training_report(model, x_test, y_test, 
+                              sensitivityAtSpecificityThreshold=sensitivityAtSpecificityThreshold,
+                              specificityAtSensitivityThreshold=specificityAtSensitivityThreshold,
+                              verbose=True)
     
 # visualize training performance
 from sbr.visualize import plot_loss_curve
@@ -79,8 +79,8 @@ _, _ = compare_predictions(model=model, x_test=x_test, y_test=y_test,
 
 
 # everything OK? save it.
-from sbr.model import save
-if save(model=model, model_path='data/model/gtex/manual', file_name="gtex_model.h5", input_size = x_train.shape[1], verbose=True):
+from sbr.model import save_architecture
+if save_architecture(model=model, model_path='data/model/gtex/manual', file_name="gtex_model.h5", input_size = x_train.shape[1], verbose=True):
     print("Done.")
 else:
     print("Something went wrong with saving the model file.")
