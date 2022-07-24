@@ -53,7 +53,7 @@ def one_layer_multicategorical(input_size=None,
                     kernel_initializer=kernel_initializer,
                     bias_initializer=bias_initializer
                     ))
-    model.add(BatchNormalization(name='1_decoder_batch_norm'))
+    model.add(BatchNormalization(name='1_batch_norm'))
     model.add(Activation('relu', name="1_activation"))
     model.add(Dropout(0.50, name='1_hidden_dropout'))
     model.add(Dense(output_size, activation=output_activation, name = "output",
