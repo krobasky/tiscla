@@ -1,7 +1,9 @@
 import tensorflow as tf
-import tensorflow.keras as keras
-from keras import Sequential
-from keras.layers import  Dense, BatchNormalization, Activation, Dropout
+
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.models import Sequential
+from sbr.layers import BADBlock
+
 def one_layer_multicategorical(input_size=None,
                                output_size=None,
                                learning_rate=0.0001,
@@ -49,13 +51,12 @@ def one_layer_multicategorical(input_size=None,
         verbose = False
 
     model = Sequential()
-    model.add(Dense(dim, input_dim=input_size, name="input",
-                    kernel_initializer=kernel_initializer,
-                    bias_initializer=bias_initializer
+    model.add(BADBlock(dim, input_dim=input_size, name="Input_BAD",
+                       activation='relu',
+                       dropout_rate = 0.50,
+                       kernel_initializer=kernel_initializer,
+                       bias_initializer=bias_initializer
                     ))
-    model.add(BatchNormalization(name='1_batch_norm'))
-    model.add(Activation('relu', name="1_activation"))
-    model.add(Dropout(0.50, name='1_hidden_dropout'))
     model.add(Dense(output_size, activation=output_activation, name = "output",
                     kernel_initializer=kernel_initializer,
                     bias_initializer=bias_initializer

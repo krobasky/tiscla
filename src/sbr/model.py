@@ -1,8 +1,15 @@
+'''
+
+! [sbr.model.save] ERROR: model not saved. Exception (<class 'ValueError'>) : Unknown layer: BADBlock. Please ensure this object is passed to the `custom_objects` argument. See https://www.tensorflow.org/guide/keras/save_and_serialize#registering_the_custom_object for details.
+! [sbr.model.save]    model_path=data/model/gtex/manual, file_name=gtex_model.h5, full_path=data/model/gtex/manual/gtex_model.h5
+
+'''
+
 import os
 import tensorflow as tf
 from keras.models import load_model
 import numpy as np
-def save_architecture(model, model_path=None, file_name="model.h5", input_size=None, verbose=True):
+def save_architecture(model, model_path=None, file_name="model.h5", input_size=None, verbose=1):
     """
     Saves the given model to the given path and name. It's a good idea
     to train and then run this in a notebook if possible so the train
@@ -16,31 +23,42 @@ def save_architecture(model, model_path=None, file_name="model.h5", input_size=N
       model_path[None]: file path where model is to be written
       file_name["model.h5"]: name of the file, h5 format. Any exisiting file will be over-written.
       input_size: if not None, attempts to check predictions on saved model are close to original model
-      verbose[True]: print out model summary. This may throw an error if model wasn't compiled with a known input size
+      verbose[1]: 0: debug, 1:print out model summary. This may throw an error if model wasn't compiled with a known input size
 
     Returns:
       True on success, False otherwise. Check the return to try again if it fails while model is still resident in memory.
 
     Example usage:
-      success = sbf.model.save(model, model_path="data/model/manual", file_name="model.h5", verbose=True)
+      success = sbf.model.save(model, model_path="data/model/manual", file_name="model.h5", verbose=1)
     """
-
+    func_name = "[sbr.model.save_architecture]"
     try: 
         if model_path is None:
-            print("! [sbr.model.save] ERROR: no model_path provided.")
+            print(f"! {func_name} ERROR: no model_path provided.")
             return False
         os.makedirs(model_path, exist_ok=True)
         full_path = os.path.join(model_path, file_name)
         model.save(full_path)
-        savedModel=tf.keras.models.load_model(full_path)
 
+        if verbose == 0:
+            print(f"{func_name} Loading model back in for a check...")
+
+        from sbr.layers import BADBlock
+        savedModel = tf.keras.models.load_model(full_path, custom_objects={'BADBlock': BADBlock})
+
+        if verbose == 0:
+            print(f"{func_name} using model to do a prediction and comparing to original model...")
         # extra check
         if input_size is not None:
             x = tf.random.uniform((10, input_size))
-            assert np.allclose(model.predict(x), savedModel.predict(x))
+            orig = model.predict(x)
+            saved = savedModel.predict(x)
+            if verbose == 0:
+                print(f"{func_name} (orig model prediction), (saved model prediction) = \n{np.argmax(orig,axis=1)}\n{np.argmax(saved, axis=1)}")
+            assert np.allclose(np.argmax(orig, axis=1), np.argmax(saved,axis=1))
 
-        if verbose:
-            print(f"Model successfully saved at: {full_path}.")
+        if verbose == 1:
+            print(f"{func_name} Model successfully saved at: {full_path}.")
             savedModel.summary()
 
         return True
@@ -48,6 +66,7 @@ def save_architecture(model, model_path=None, file_name="model.h5", input_size=N
     except Exception as e:
         # its really important to not just exit the current execution state if the model save fails after hours of training, 
         # so catch and print out exception issues if it fails.
-        print(f"! [sbr.model.save] ERROR: model not saved. Exception ({type(e)}) : {e}")
-        print(f"! [sbr.model.save]    model_path={model_path}, file_name={file_name}, full_path={full_path}")
+        print(f"! {func_name} ERROR: model not saved. Exception ({type(e)}) : {e}")
+        print(f"! {func_name}    model_path={model_path}, file_name={file_name}, full_path={full_path}")
         return False
+
