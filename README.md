@@ -183,13 +183,3 @@ You can monitor your nvidia process with the following:
 nvidia-smi dmon
 ```
 
-## Install data and other supporting apps
-
-Install data to `./src/data` to run with the provided apps
-
-## GTeX
-
-# Future
-Following are future features:
-
-
