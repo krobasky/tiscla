@@ -1,0 +1,26 @@
+Adipose Tissue
+Adrenal Gland
+Blood
+Blood Vessel
+Brain
+Breast
+Colon
+Esophagus
+Heart
+Liver
+Lung
+Muscle
+Nerve
+Ovary
+Pancreas
+Pituitary
+Prostate
+Salivary Gland
+Skin
+Small Intestine
+Spleen
+Stomach
+Testis
+Thyroid
+Uterus
+Vagina
