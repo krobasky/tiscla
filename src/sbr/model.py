@@ -64,9 +64,10 @@ def save_architecture(model, model_path=None, file_name="model.h5", input_size=N
         return True
 
     except Exception as e:
+        import traceback
+        import sys
         # its really important to not just exit the current execution state if the model save fails after hours of training, 
         # so catch and print out exception issues if it fails.
         print(f"! {func_name} ERROR: model not saved. Exception ({type(e)}) : {e}")
-        print(f"! {func_name}    model_path={model_path}, file_name={file_name}, full_path={full_path}")
+        print(f"! {func_name}    model_path={model_path}, file_name={file_name}, full_path={full_path}, stack={traceback.print_exception(*(sys.exc_info()))}")
         return False
-

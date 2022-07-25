@@ -9,6 +9,8 @@ from keras import activations
 import absl.logging
 absl.logging.set_verbosity(absl.logging.ERROR)
 
+verbose = True
+
 class BADBlock(layers.Dense):
     '''
     Dense layer followed by Batch, Activation, Dropout. When popular
@@ -35,28 +37,38 @@ class BADBlock(layers.Dense):
     '''
     def __init__(self, units,
                  activation = 'relu',
-                 # need to rename activation and set it to 'None' so Dense doesn't use it, 
-                 # but still want user to be able to use reactivation, 
-                 # but need an argument to __init__ so get_config can use and save it in the model.save function
+                 # need to rename the 'activation' parameter so the Dense superclass doesn't use it, 
+                 # because the Activation layer is responsible for 'activation'.
+                 # But still we want user to be able to use the 'activation' parameter.
+                 # but we need an argument to __init__ so 'get_config' can use and save it in the 'model.save' function
                  # so...
-                 # make another argument 'proxy_activation' and hope the user doesn't call it, 
-                 # then override 'proxy_activation' value with the value of the 'activation' argument above
-                 # that way you can keep the self.activation = None, but you still have proxy_activation for get_config
-                 # There's got to be a better way this is an ugly kludge!
-                 proxy_activation = None, 
+                 # Make another argument, 'block_activation',
+                 # then override 'block_activation' value with the value of the 'activation' argument above.
+                 # That way even if 'self.activation' = 'linear', you still have 'block_activation' for 'get_config'.
+                 # This is odd, but only causes strange behavior if user sets both activation and block_activation at the same time.
+                 block_activation = None, 
                  dropout_rate = 0.50, 
                  trainable= True,
                  **kwargs
                  ):
-        super(BADBlock, self).__init__(units, activation=None, **kwargs)
+        if block_activation is None:
+            # this gets called when end user sets activation paramater
+            self.block_activation = activation
+        else:
+            # this gets called when loading model from file
+            self.block_activation = block_activation
+
+        # The superclass Dense layer is just a pass through to the Activation
+        super(BADBlock, self).__init__(units, activation='linear', **kwargs)
+
         self.dropout_rate = dropout_rate
         self.trainable = trainable
-        self.proxy_activation = activation
+
 
     def build(self, input_shape):
         super(BADBlock, self).build(input_shape)
         self.batch_layer = BatchNormalization(name = "hidden_batch_normalization")
-        self.activation_layer = Activation(self.proxy_activation, name = "hidden_activation")
+        self.activation_layer = Activation(self.block_activation, name = "hidden_activation")
         self.dropout_layer = Dropout(self.dropout_rate, name = 'hidden_dropout')
               
     def call(self, inputs):
@@ -68,6 +80,6 @@ class BADBlock(layers.Dense):
         config = super(BADBlock,self).get_config()
         config["dropout_rate"] = self.dropout_rate
         config["trainable"] = self.trainable
-        config["proxy_activation"] = self.proxy_activation
+        config["block_activation"] = self.block_activation
 
         return config
