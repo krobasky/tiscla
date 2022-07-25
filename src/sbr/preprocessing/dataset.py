@@ -16,7 +16,7 @@ def multicategorical_split(X, y,
     
     Final dataset size is (sample_count_threshold * <number of classes>) 
  
-    see also: sbr.gtex.dataset_setup
+    see also: sbr.preprocessing.gtex.dataset_setup
 
     Args:
       X: Features

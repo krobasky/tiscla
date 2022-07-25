@@ -16,9 +16,6 @@ Welcome to sbr's documentation!
 .. automodule:: sbr.model
    :members:
 
-.. automodule:: sbr.train
-   :members:
-
 .. automodule:: sbr.visualize
    :members:
 

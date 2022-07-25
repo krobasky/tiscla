@@ -17,7 +17,7 @@ def dataset_setup(sample_count_threshold=100,
       `x_train, x_test,y_train, y_test = sklearn.model_selection.train_test_split(X, np.array(y), test_size=1.-fraction, random_state=42, shuffle=True)`
 
     Class names can be retrieved from the returned target aray (y) and ordered list of class names (class_names) as such:
-      ``class_names[np.argmax[y]]`
+      `class_names[np.argmax[y]]`
 
     Args:
       sample_count_threshold: drop any classes that are less than this threshold. If 'None', don't drop any classes
