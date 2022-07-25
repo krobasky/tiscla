@@ -1,4 +1,3 @@
-cudnn
 jupyter
 keras-applications
 pillow
