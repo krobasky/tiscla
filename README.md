@@ -1,3 +1,5 @@
+[![Documentation Status](https://readthedocs.org/projects/tiscla/badge/?version=latest)](https://tiscla.readthedocs.io/en/latest/?badge=latest)
+
 # TISCLA1: Tissue Classifier
 
 This tissue classifier is trained on gene expression data from GTEx and can be used to initialize weights or as an architecture for training platform/lab-specific classifiers.
