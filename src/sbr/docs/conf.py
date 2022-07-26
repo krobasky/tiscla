@@ -6,6 +6,11 @@
 # full list see the documentation:
 # http://www.sphinx-doc.org/en/master/config
 
+
+# resources:
+# https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html
+# https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings
+
 # -- Path setup --------------------------------------------------------------
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -14,6 +19,8 @@
 #
 import os
 import sys
+import sphinx_rtd_theme
+
 sys.path.insert(0, os.path.abspath('../..'))
 
 autodoc_mock_imports = ['tensorflow', 'keras', 'absl', 'pandas']
@@ -26,9 +33,9 @@ copyright = '2022, K. Robasky'
 author = 'K. Robasky'
 
 # The short X.Y version
-version = ''
+version = '0.1'
 # The full version, including alpha/beta/rc tags
-release = 'v0.1'
+release = '0.1'
 
 
 # -- General configuration ---------------------------------------------------
@@ -44,6 +51,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.coverage',
     'sphinx.ext.napoleon',
+    'sphinx_rtd_theme',
     'myst_parser'
 ]
 
@@ -87,7 +95,9 @@ pygments_style = None
 # a list of builtin themes.
 #
 #html_theme = 'sphinx_rtd_theme'
-html_theme = 'alabaster'
+html_theme = "sphinx_rtd_theme"
+#html_theme = 'alabaster'
+
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the

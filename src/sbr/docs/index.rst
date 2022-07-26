@@ -1,16 +1,23 @@
 Welcome to sbr's documentation!
 ===============================
 
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
 .. automodule:: sbr.compile
+   :members:
+
+.. automodule:: sbr.layers
    :members:
 
 .. automodule:: sbr.evaluate
    :members:
 
 .. automodule:: sbr.fit
-   :members:
-
-.. automodule:: sbr.layers
    :members:
 
 .. automodule:: sbr.model
@@ -26,12 +33,6 @@ Welcome to sbr's documentation!
    :members:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
    :caption: Contents:
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
