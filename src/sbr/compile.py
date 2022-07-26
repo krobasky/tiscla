@@ -4,34 +4,46 @@ from tensorflow.keras.layers import Dense
 from tensorflow.keras.models import Sequential
 from sbr.layers import BADBlock
 
-def one_layer_multicategorical(input_size=None,
-                               output_size=None,
-                               learning_rate=0.0001,
-                               dim=1000,
-                               specificityAtSensitivityThreshold=0.50,
-                               sensitivityAtSpecificityThreshold=0.50,
+def one_layer_multicategorical(input_size = None,
+                               output_size = None,
+                               learning_rate: float = 0.0001,
+                               dim: int = 1000,
+                               specificityAtSensitivityThreshold: float = 0.50,
+                               sensitivityAtSpecificityThreshold: float = 0.50,
                                kernel_initializer = tf.keras.initializers.HeNormal(), 
                                bias_initializer = tf.zeros_initializer(),
-                               output_activation='softmax',
-                               isMultilabel=True,
-                               verbose=True):
-    """
-    Compile a single layer multicategorical model. Can use `sbr.visualize.plot_loss_curve` to see the metrics after fitting
+                               output_activation: str ='softmax',
+                               isMultilabel: bool = True,
+                               verbose: bool = True):
+    """Compile a single layer multicategorical model. 
+
+    Can use `sbr.visualize.plot_loss_curve` to see the metrics after fitting
 
     Args:
-      input_size [None]: usually `x_train.shape[1]`; not required for compile, but for calling `model.summary()`
-      output_size [None]: number of classes in the one-hot-encoded target vector; usually `y_train.shape[1]`
-      learning_rate [0.0001]: Plan for this to be reduced during `EarlyStopping` checkpoints in the model training/fit
+      input_size:  [None] usually `x_train.shape[1]`; not required for compile, but for calling `model.summary()`
+
+      output_size: [None] number of classes in the one-hot-encoded target vector; usually `y_train.shape[1]`
+
+      learning_rate: [0.0001] Plan for this to be reduced during `EarlyStopping` checkpoints in the model training/fit
+
       dim [1000]: Number of nodes to have in the hidden layer. Somthing half-way between input_size and output_size is a good choice, but if input_size is very big, the number may need to be smaller in order to reduce the number of trainable parameters and avoid over-fitting.
+
       specificityAtSensitivityThreshold [0.50]: With this percentage of sensitivity (e.g., detecting at least this many true positives), find the specificity (e.g., how many identified will actually be correct). This is a bit trickier for multivariate problems, see: https://www.analyticsvidhya.com/blog/2021/06/confusion-matrix-for-multi-class-classification/
+
       sensitivityAtSpecificityThreshold [0.50]: 
+
       kernel_initializer [tf.keras.initializers.HeNormal()]: HeNormal initializer forces diversity of outcomes between trainings
+
       bias_initializder  [ tf.zeros_initializer()]: 
+
       output_activation ['softmax']: 
+
       isMultilabel [True]: Should alwasy be True for multicategorical models
+
       verbose [True)]: If True, print model summary. Set to False if input_size = None to avoid error
 
     Returns:
+      model
 
     Example usage:
       model = compile.one_layer_multicategorical(input_size=x_train.shape[1],
