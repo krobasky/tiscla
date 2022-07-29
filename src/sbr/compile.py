@@ -20,33 +20,39 @@ def one_layer_multicategorical(input_size = None,
     Can use `sbr.visualize.plot_loss_curve` to see the metrics after fitting
 
     Args:
-      input_size:  [None] usually `x_train.shape[1]`; not required for compile, but for calling `model.summary()`
+      input_size: Usually `x_train.shape[1]`; not required for compile, but for calling `model.summary()`
 
-      output_size: [None] number of classes in the one-hot-encoded target vector; usually `y_train.shape[1]`
+      output_size: Number of classes in the one-hot-encoded target vector; usually `y_train.shape[1]`
 
-      learning_rate: [0.0001] Plan for this to be reduced during `EarlyStopping` checkpoints in the model training/fit
+      learning_rate: Plan for this to be reduced during `EarlyStopping` checkpoints in the model training/fit
 
-      dim [1000]: Number of nodes to have in the hidden layer. Somthing half-way between input_size and output_size is a good choice, but if input_size is very big, the number may need to be smaller in order to reduce the number of trainable parameters and avoid over-fitting.
+      dim: Number of nodes to have in the hidden layer. Somthing half-way between input_size and output_size is a good choice, but if input_size is very big, the number may need to be smaller in order to reduce the number of trainable parameters and avoid over-fitting.
 
-      specificityAtSensitivityThreshold [0.50]: With this percentage of sensitivity (e.g., detecting at least this many true positives), find the specificity (e.g., how many identified will actually be correct). This is a bit trickier for multivariate problems, see: https://www.analyticsvidhya.com/blog/2021/06/confusion-matrix-for-multi-class-classification/
+      specificityAtSensitivityThreshold: With this percentage of sensitivity (e.g., detecting at least this many true positives), find the specificity (e.g., how many identified will actually be correct). This is a bit trickier for multivariate problems, see `this blog artical on analyticsvidhya.com <https://www.analyticsvidhya.com/blog/2021/06/confusion-matrix-for-multi-class-classification/>`_
 
-      sensitivityAtSpecificityThreshold [0.50]: 
+      sensitivityAtSpecificityThreshold: Same as above, but for specificity.
 
-      kernel_initializer [tf.keras.initializers.HeNormal()]: HeNormal initializer forces diversity of outcomes between trainings
+      kernel_initializer: HeNormal initializer forces diversity of outcomes between trainings
 
-      bias_initializder  [ tf.zeros_initializer()]: 
+      bias_initializder: initialize biases
 
-      output_activation ['softmax']: 
+      output_activation: Use `softmax` for multicategorical, one-hot encoded
 
-      isMultilabel [True]: Should alwasy be True for multicategorical models
+      isMultilabel: Should alwasy be True for multicategorical models
 
-      verbose [True)]: If True, print model summary. Set to False if input_size = None to avoid error
+      verbose: If True, print model summary. Set to False if input_size = None to avoid error
 
     Returns:
-      model
+      model of type 
+      `tf.keras.model <https://keras.io/api/models/model#model-class>`_
+
+
+
+
 
     Example usage:
-      model = compile.one_layer_multicategorical(input_size=x_train.shape[1],
+
+      >>> model = compile.one_layer_multicategorical(input_size=x_train.shape[1],
                                            output_size=y_train.shape[1],
                                            output_activation='softmax',
                                            learning_rate=0.0001,
@@ -55,6 +61,19 @@ def one_layer_multicategorical(input_size = None,
                                            specificityAtSensitivityThreshold=0.50,
                                            sensitivityAtSpecificityThreshold=0.50,
                                            verbose=True)
+        Model: "sequential"
+        _________________________________________________________________
+        Layer (type)                 Output Shape              Param #   
+        =================================================================
+        Input_BAD (BADBlock)         (None, 1000)              18968000  
+        _________________________________________________________________
+        output (Dense)               (None, 26)                26026     
+        =================================================================
+        Total params: 18,994,026
+        Trainable params: 18,992,026
+        Non-trainable params: 2,000
+        _________________________________________________________________
+
     """
     import tensorflow as tf
     

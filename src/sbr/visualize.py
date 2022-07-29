@@ -9,42 +9,55 @@ def plot_loss_curve(history,
                     write_directory="data/images",
                     file_name="nn-loss-curve.png",
                     show_plot=True):
-    """
-    Plot a loss, accuracy curve. Assumes loss and accuracy were compiled into the model metrics.
-    If this is running in a notebook, the `plt.show()` command doesn't matter and the plot will just who no matter what
+  """Plot a loss, accuracy curve. Assumes loss and accuracy were compiled into the model metrics.
+  If this is running in a notebook, the `plt.show()` command doesn't matter and the plot will show no matter what
 
-    Args:
-      history: history object returned from model.fit (or sbr.fit.multicategorical_model)
-      figsize [(5,5)]: tuple for the size of the figure
-      metrics []: traces to plot
-      write_directory [['loss','accuracy']]: where to write out the figure (if None, nothing is saved)
-      file_name ["data/images"]: override filename of figure to be written
-      show [True]: if True, show to figure to display
+  Args:
+    history: history object returned from model.fit (or sbr.fit.multicategorical_model)
 
-    Returns:
-      plots to display if show= True, saves image if write_directory not None
+    figsize: tuple for the size of the figure
 
-    Example usage:
-      plot_loss_curve(figsize=(5,5)
-                history, ['loss','accuracy','val_accuracy'],
+    metrics: traces to plot
+
+    write_directory: : where to write out the figure (if None, nothing is saved)
+
+    file_name: override filename of figure to be written
+
+    show: if True, show to figure to display
+
+  Returns:
+    plots to display if show= True, saves image if write_directory not None
+
+  Example Usage:
+    >>> plot_loss_curve(history=history, 
+                figsize=(5,5),
+                metrics = ['loss','accuracy','val_accuracy'],
                 write_directory="data/images",
-                show=True)
+                file_name="nn-loss-curve.png",
+                show_plot=True)
+    >>> import matplotlib.pyplot as plt
+    >>> import matplotlib.image as mpimg
+    >>> img = mpimg.imread("nn-loss-curve.png")
+    >>> plt.imshow(img);
 
-    """
-    plt.figure(figsize=figsize)
-    plt.title('Training metrics')
-    plt.plot(history.history['loss'], label='loss')
-    plt.ylabel('loss')
-    for metric in metrics:
+    .. image:: images/loss_curve.png
+
+  """
+
+  plt.figure(figsize=figsize)
+  plt.title('Training metrics')
+  plt.plot(history.history['loss'], label='loss')
+  plt.ylabel('loss')
+  for metric in metrics:
         if metric == "loss":
             continue
         plt.plot(history.history[metric], label=metric)
-    plt.xlabel('Epochs')
-    plt.legend()
-    if write_directory is not None:
+  plt.xlabel('Epochs')
+  plt.legend()
+  if write_directory is not None:
         os.makedirs(write_directory, exist_ok=True)
         plt.savefig(os.path.join(write_directory, file_name))
-    if show_plot:
+  if show_plot:
         plt.show()
 
 
@@ -65,21 +78,30 @@ def plot_cm(y_test, y_pred, figsize=(10,10), labelsize=20, textsize=15, classes=
 
   Args:
     y_test: Array of truth labels (must be same shape as y_pred).
+
     y_pred: Array of predicted labels (must be same shape as y_true).
+
     figsize: Size of output figure (default=(10, 10)).
+
     label_size: Size of label text (default=20).
+
     text_size: Size of output figure text (default=15).
+
     classes: Array of class labels (e.g. string form). If `None`, integer labels are used.
   
   Returns:
     A labelled confusion matrix plot comparing y_test and y_pred.
 
+
   Example usage:
-    make_confusion_matrix(y_test=test_labels, # ground truth test labels
-                          y_pred=y_preds, # predicted labels
-                          classes=class_names, # array of class label names
-                          figsize=(15, 15),
-                          text_size=10)
+    >>> make_confusion_matrix(y_test=test_labels, # ground truth test labels
+                              y_pred=y_preds, # predicted labels
+                              classes=class_names, # array of class label names
+                              figsize=(15, 15),
+                              text_size=10)
+   .. image:: images/example_cm.png
+
+
   """  
   import itertools
 

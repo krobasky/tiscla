@@ -60,8 +60,8 @@ def trim_list_size_to_batch_size_factor(batch_size=32, trim_list=None):
     Returns:
       the same trim_list, but trimmed
 
-    Usage:
-      [x_train, y_train, x_val, y_val, x_test, y_test] = trim_list_size_to_batch_size_factor([x_train, y_train, x_val, y_val, x_test, y_test])
+    Example Usage:
+      >>> [x_train, y_train, x_val, y_val, x_test, y_test] = trim_list_size_to_batch_size_factor([x_train, y_train, x_val, y_val, x_test, y_test])
 
     """
     return [ x[:-( x.shape[0] % batch_size ), :] if x.shape[0] % batch_size != 0 else x for x in trim_list ]

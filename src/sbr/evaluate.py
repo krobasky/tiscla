@@ -11,12 +11,30 @@ def compare_predictions(model, x_test, y_test, class_names=None, verbose = True)
       verbose: if verbose, pairs are printed out (good if there aren't a lot of mislabeled predictions)
 
     Returns: 
-      (y_pred, pairs) where
-      y_pred: the predicted outcomes from x_test
-      pairs: list pairs of (<truth><false-prediction>) class names
 
-    Exampe usasge:
-      y_pred, pairs = compare_predictions(model=model, x_test=x_test, y_test=ytest, class_names=class_names, verbose = True)
+       `(y_pred, pairs)`
+
+       * y_pred: the predicted outcomes from x_test
+       * pairs: list pairs of (<truth><false-prediction>) class names
+
+
+
+    Exampe usage:
+      >>> y_pred, pairs = compare_predictions(model=model, 
+                                              x_test=x_test, y_test=ytest, 
+                                              class_names=class_names, 
+                                              verbose = True)
+
+    .. code-block:: text
+
+      Number of test samples: 256
+      Mis-classifications:
+      (<truth>,<false-prediction>)
+      [('Esophagus', 'Blood Vessel'), ('Blood Vessel', 'Heart'), ('Adipose Tissue', 'Breast'), ('Salivary Gland', 'Esophagus')]
+      [sbr.model.save_architecture] Model successfully saved at: data/model/gtex/manual/gtex_model.h5.
+      Model: "sequential"
+
+
     '''
     y_pred = model.predict(x_test)
 
@@ -43,7 +61,7 @@ def training_report(model, x_test, y_test,
                     specificityAtSensitivityThreshold=None,
                     verbose=True):
     """
-    Calls `model.evaluate(x_test,y_test)` and, if verbose, reports on the performance, then returns a performance object.
+    Calls model.evaluate(x_test,y_test) and, if verbose, reports on the performance, then returns a performance object like the one returned by `model.evaluate <https://www.tensorflow.org/api_docs/python/tf/keras/Model#evaluate>`_.
 
     Args:
       x_test: features
@@ -53,13 +71,37 @@ def training_report(model, x_test, y_test,
       specificityAtSensitivityThreshold: see above
 
     Returns:
-      performance object from the model.evaluate function; see `Returns` for https://www.tensorflow.org/api_docs/python/tf/keras/Model#evaluate
+      A performance object
 
-    Example useage:
-      performance = training_report(model, x_test, y_test, 
+    Example Usage:
+      >>> performance = training_report(model, x_test, y_test, 
                                     sensitivityAtSpecificityThreshold=sensitivityAtSpecificityThreshold,
                                     specificityAtSensitivityThreshold=specificityAtSensitivityThreshold,
                                     verbose=True)
+
+    .. code-block:: text
+
+      Performance: 
+      Performance details: 
+        loss:0.07804308831691742
+        accuracy:0.984375
+        mse:0.0009617832256481051
+        precision:0.984375
+        recall:0.984375
+        auc:0.9988833665847778
+        SpecificityAtSensitivity:0.9998437762260437
+        SensitivityAtSpecificity:0.99609375
+        fp:4.0
+        fn:4.0
+        tp:252.0
+        tn:6396.0
+      Figure(500x500)
+      Number of training samples: 2080
+      Number of validation samples: 256
+
+    ...
+
+
     """
     performance = model.evaluate(x_test,y_test)
     if(verbose):
@@ -99,15 +141,29 @@ def mislabeled_pair_counts(model, X, y, class_names, sample_ids=None, batch_size
         verbose: helps with debugging; messages each step/batch
 
     Returns:
-      (pairs_counts, pair_id_map) where
-      pairs_counts: Table with compound index 'observed','predicted' and one column, "counts", with the count of all the  
-      the samples in that observed/predicted mislabeled pair.
-      pair_id_map: None if sample_ids wasn't passed in, otherwise returns a table with columns observed, predicted, sample_id
+      (pairs_counts, pair_id_map)
 
-    Example Usage:
-       mislabeled_counts, mislabeled = mislabeled_pair_counts(model=model, X=X, y=y, class_names=class_names, 
-                                                              sample_ids = pd.Series(label_df["sample_id"]),
-                                                              batch_size=500)
+      * pairs_counts: Table with compound index 'observed','predicted' and one column, "counts", with the count of all the  
+      * the samples in that observed/predicted mislabeled pair.
+      * pair_id_map: None if sample_ids wasn't passed in, otherwise returns a table with columns observed, predicted, sample_id
+
+    Example Usage: Get the mislabeled counts
+       >>> mislabeled_counts, mislabeled = mislabeled_pair_counts(model=model, X=X, y=y, class_names=class_names, 
+                                                                  sample_ids = pd.Series(label_df["sample_id"]),
+                                                                  batch_size=500)
+       >>> mislabeled_counts
+
+    .. image:: images/mislabeled_counts.png
+
+
+    Example Usage: Get the mislabeled samples
+       >>> m=mislabeled.reset_index()
+       >>> m[m['observed']=="Lung"]
+
+    .. image:: images/mislabeled_lung.png
+
+
+
     """
     # break up the dataset, there's too many to predict at once; define a function to use for the iterations
     def mislabeled_pairs(class_names, y_pred, y_obs, unique_sample_indexes):

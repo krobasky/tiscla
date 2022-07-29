@@ -12,41 +12,89 @@ def multicategorical_model(model, model_folder, x_train, y_train, x_validation, 
                            initial_epoch=0,
                            train_verbose=1,
                            checkpoint_verbose=1):
-    """
-    Fits the given model with the given hyperparameters and multi-categorical data, after computing class weights and shuffling the data. Writes checkpoint and final model weights to model_folder. Look under variables/variables.* for weights. Reload with: `model=load_model('f{model_path}'); model.load_weights(f"{model_folder}")`
+    """Fits the given model with the given hyperparameters and multi-categorical data, after computing class weights and shuffling the data. Writes checkpoint and final model weights to `model_folder`. Look under `variables/variables.*` for weights. 
 
-    Assumptions:
-      * Model has been compiled and saved to f"{model_path}.h5" (e.g., `data/model/gtex/manual/gtex_model.h5`)
-      * Targets are one-hot encoded
-      * Features have been normalized
+    .. admonition:: Assumptions
+    
+        * Model has been compiled and saved to f"{model_path}.h5" (e.g., `data/model/gtex/manual/gtex_model.h5`)
+        * Targets are one-hot encoded
+        * Features have been normalized
 
     Tested with tensorflow v2.6.2, keras 2.6.0
     
     Args:
       model: a compiled model
+
       model_folder: writable folder to store the checkpoint and final model weights
+
       x_train: training features, see sbr.split for help
+
       y_train: training targets,  see above
+
       x_validation: validation feature, see above
+
       y_validation: validation feature, see above
+
       epochs [200]: Number of epochs to train
+
       patience [4]: Number of epochs with no improvement after which training will be stopped.
+
       lr_patience [2]: Number of epochs with no improvement after which learning rate will be reduced.
+
       lr_factor [0.1]: Factor by which the learning rate will be reduced. new_lr = lr * factor.
-      batch_size [32]: probably don't change this, see: https://wandb.ai/ayush-thakur/dl-question-bank/reports/What-s-the-Optimal-Batch-Size-to-Train-a-Neural-Network---VmlldzoyMDkyNDU
+
+      batch_size [32]: probably don't change this
+
       shuffle_value [100]:
+
       initial_epoch [0]: use this if you want to resume training at a particular epoch
-      train_verbose [0]: amount of information to print on each epoch. for 0: silent, 1: animited progress bar, 2: mentions epoch. For example:
-      * 0: <silent>
-      * 1: [==================]
-      * 2: Epoch 1/10
-      checkpoint_verbose [1]: amount of information to print on each epoch about the checkpoint. 0: silent.
-      * 0: <silent>
-      * 1: Epoch 00015: val_loss improved from 0.06645 to 0.06611, saving model to data/model/gtex
-      INFO:tensorflow:Assets written to: data/model/gtex/assets
+
+      train_verbose [0]: amount of information to print on each epoch. for 0: silent, 1: animated progress bar, 2: mentions epoch. For example:
+
+        * 0: <silent>
+        * 1: 
+        .. code-block::
+
+          [==================]
+          Epoch 00015: val_loss improved from 0.06645 to 0.06611, saving model to 
+               data/model/gtex
+          INFO:tensorflow:Assets written to: data/model/gtex/assets
+    
+
+        * 2: 
+
+        .. code-block::
+
+          Epoch 1/10
+          checkpoint_verbose [1]: amount of information to print on each epoch about the 
+              checkpoint. 0: silent.
+
+
 
     Returns: 
-      history: A History object. Its History.history attribute is a record of training loss values and metrics values at successive epochs, as well as validation loss values and validation metrics values (if applicable). Use `print(history.history.keys())` to see all the hist and `print(history.history['val_loss'])` to print validation loss
+      history
+
+      A History object. Its History.history attribute is a record of training loss values and metrics values at successive epochs, as well as validation loss values and validation metrics values (if applicable). Use `print(history.history.keys())` to see all the hist and `print(history.history['val_loss'])` to print validation loss
+
+    Example Usage:
+      >>> from sbr import fit
+      >>> history=fit.multicategorical_model(model=model, 
+                                   model_folder ='data/model/gtex',
+                                   x_train=x_train, y_train=y_train, 
+                                   x_validation=x_validation, y_validation=y_validation, 
+                                   epochs = 200,
+                                   patience = 4,
+                                   lr_patience = 2,
+                                   checkpoint_verbose=1,
+                                   train_verbose=0)
+
+
+    Example Usage: Reload with: 
+      >>> model = load_model('f{model_path}')
+      >>> model.load_weights(f"{model_folder}")
+
+
+
 
     """
     # compute class weights

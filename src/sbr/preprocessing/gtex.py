@@ -10,14 +10,7 @@ def dataset_setup(sample_count_threshold=100,
                   attr_sample_id_column_name = "SAMPID",
                   expr_sample_id_column_name = "sample_id",
                   verbose=True):
-    """
-    Reads the expression and attribute feather files, normalizes the expression values, one-hot encodes the classes, and returns the features, targets and labels in coordinated order.
-
-    The return from this function (X, y) can be split as such:
-      `x_train, x_test,y_train, y_test = sklearn.model_selection.train_test_split(X, np.array(y), test_size=1.-fraction, random_state=42, shuffle=True)`
-
-    Class names can be retrieved from the returned target aray (y) and ordered list of class names (class_names) as such:
-      `class_names[np.argmax[y]]`
+    """Reads the expression and attribute feather files, normalizes the expression values, one-hot encodes the classes, and returns the features, targets and labels in coordinated order.
 
     Args:
       sample_count_threshold: drop any classes that are less than this threshold. If 'None', don't drop any classes
@@ -30,13 +23,20 @@ def dataset_setup(sample_count_threshold=100,
       verbose: 
     
     Returns:
-      X: Normalized feature values
-      y: One-hot encoded target values
-      class_names: Ordered list of strings, one item per class. This will be handy for understanding the predictions
-      label_df:
+      (X, y, class_names, label_df)
 
-    Example usage;
-      X, y, class_names, label_df = dataset_setup(100)
+      * X: Normalized feature values
+      * y: One-hot encoded target values
+      * class_names: Ordered list of strings, one item per class. This will be handy for understanding the predictions
+      * label_df: a dataframe that combines X, y, class_names, and IDs together
+
+    Example Usage;
+      >>> X, y, class_names, label_df = dataset_setup(100)
+      >>> # The return from this function (X, y) can be split as such:
+      >>> x_train, x_test,y_train, y_test = sklearn.model_selection.train_test_split(X, np.array(y), test_size=1.-fraction, random_state=42, shuffle=True)`
+      >>> # Class names can be retrieved from the returned target aray (y) and ordered list of class names (class_names) as such:
+      >>> class_names[np.argmax[y]]
+
     
     """
     expr_df = pd.read_feather(expr_path)

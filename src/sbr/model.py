@@ -1,35 +1,44 @@
-'''
-
-! [sbr.model.save] ERROR: model not saved. Exception (<class 'ValueError'>) : Unknown layer: BADBlock. Please ensure this object is passed to the `custom_objects` argument. See https://www.tensorflow.org/guide/keras/save_and_serialize#registering_the_custom_object for details.
-! [sbr.model.save]    model_path=data/model/gtex/manual, file_name=gtex_model.h5, full_path=data/model/gtex/manual/gtex_model.h5
-
-'''
-
 import os
 import tensorflow as tf
 from keras.models import load_model
 import numpy as np
-def save_architecture(model, model_path=None, file_name="model.h5", input_size=None, verbose=1):
+def save_architecture(model, model_path: str = None, file_name = "model.h5", input_size = None, verbose = 1):
     """
     Saves the given model to the given path and name. It's a good idea
     to train and then run this in a notebook if possible so the train
     model is resident in memory because this function can be tried
     again in case it fails for some reason.
 
-    WARNING: THIS WILL OVER-WRITE ANY EXISTING MODEL.
+    .. note:: 
+    
+      Custom layer BADBlock will be loaded as part of the configuration.
+
+    .. warning:: 
+
+      THIS WILL OVER-WRITE ANY EXISTING MODEL.
+
+
 
     Args:
+    
       model: model object for calling `model.save`
-      model_path[None]: file path where model is to be written
-      file_name["model.h5"]: name of the file, h5 format. Any exisiting file will be over-written.
+
+      model_path: file path where model is to be written
+
+      file_name: name of the file, h5 format. Any exisiting file will be over-written.
+
       input_size: if not None, attempts to check predictions on saved model are close to original model
-      verbose[1]: 0: debug, 1:print out model summary. This may throw an error if model wasn't compiled with a known input size
+
+      verbose: 0: debug, 1:print out model summary. This may throw an error if model wasn't compiled with a known input size
 
     Returns:
       True on success, False otherwise. Check the return to try again if it fails while model is still resident in memory.
 
     Example usage:
-      success = sbf.model.save(model, model_path="data/model/manual", file_name="model.h5", verbose=1)
+
+      >>> success = sbf.model.save(model, model_path="data/model/manual", file_name="model.h5", verbose=1)
+      True
+
     """
     func_name = "[sbr.model.save_architecture]"
     try: 

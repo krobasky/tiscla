@@ -1,12 +1,18 @@
 Welcome to sbr's documentation!
 ===============================
+	       
+sbr is a set of useful functions and classes for modelling gene expression data with tensorflow.
+
 
 Indices and tables
 ==================
 
 * :ref:`genindex`
 * :ref:`modindex`
-* :ref:`search`
+
+
+Full Reference
+==================
 
 .. automodule:: sbr.compile
    :members:
