@@ -12,15 +12,17 @@ SAVE_PATH="data/gtex"
 _DESCRIPTION = """ Downloads v8 GTEx and cognoma annotations, filters genes that are
  not in entrez that are not named in and returns a
 dataset with an array of counts and a tissue type (SMTS, not
-SMTSD). To build this dataset requires every bit of 36GB RAM
+SMTSD). To build this dataset requires every bit of 36GB RAM. 
 
 Rows with na's are dropped, medians replace duplicates (199 genes are duplicated, some more than twice, for a total of 1608 values)
 
 There are originally 56,203 GTEx annotations which are collapsed down to 18,963 annotions.
 
-Dataframe of SAMPID, SMTS, sample_id, <18,963 gene counts>, tissue type, and  is written to: f"{SAVE_PATH}/expr.ftr"# xxx maybe rm sample_id, add SMTSD, and the other stuff? 1.5GB
+Dataframe of SAMPID, SMTS, sample_id, <18,963 gene counts>, tissue type, and  is written to: f"{SAVE_PATH}/expr.ftr"
 Gene order is written to: f"{SAVE_PATH}/gene_ids.txt"
 superclass sample count is written to: f"{SAVE_PATH}//superclass-count.tsv"
+
+"Bone Marrow" is in the GTEx dataset but has no samples with gene counts and is not included.
 
 Training example:
 ```
@@ -50,7 +52,15 @@ import numpy as np
 # predict on the first batch of test dataset 'ds_test' (can use ds as demonstration):
 [np.argmax(logits) for logits in model.predict(ds_test.take(1)) ]
 ```
+Example: retrieve X, y, class_names:
+```
+ds, info = tfds.load("gtex", split="train", with_info = True, as_supervised=True)
+l=list(iter(ds.take(info.splits['train'].num_examples)))
+X, y = map(np.array, zip(*l))
+class_names = info.features['label'].names
+y = tf.one_hot(le.fit.transform(y)
 
+```
 """
 
 _CITATION = """
@@ -58,7 +68,7 @@ _CITATION = """
 
 NUM_ROWS=None
 NUM_GENES = 18963
-TISSUE_LIST = ['Colon', 'Heart', 'Blood', 'Vagina', 'Thyroid', 'Liver', 'Salivary_Gland', 'Pancreas', 'Cervix_Uteri', 'Prostate', 'Ovary', 'Bone_Marrow', 'Skin', 'Pituitary', 'Small_Intestine', 'Fallopian_Tube', 'Adrenal_Gland', 'Nerve', 'Adipose_Tissue', 'Spleen', 'Stomach', 'Muscle', 'Blood_Vessel', 'Lung', 'Esophagus', 'Brain', 'Testis', 'Uterus', 'Kidney', 'Bladder', 'Breast']
+TISSUE_LIST = ['Colon', 'Heart', 'Blood', 'Vagina', 'Thyroid', 'Liver', 'Salivary_Gland', 'Pancreas', 'Cervix_Uteri', 'Prostate', 'Ovary', 'Skin', 'Pituitary', 'Small_Intestine', 'Fallopian_Tube', 'Adrenal_Gland', 'Nerve', 'Adipose_Tissue', 'Spleen', 'Stomach', 'Muscle', 'Blood_Vessel', 'Lung', 'Esophagus', 'Brain', 'Testis', 'Uterus', 'Kidney', 'Bladder', 'Breast']
 
 if g_quick_build == True:
   NUM_ROWS=256 
@@ -167,11 +177,10 @@ class Gtex(tfds.core.GeneratorBasedBuilder):
     expr_df.index.rename('sample_id', inplace=True)
 
 
-    # xxxxxxxxxxx
     # change gene integer ids to strings so feather will accept column names  
     expr_df.columns=expr_df.columns.astype(str)
 
-    NUM_GENES=len(expr_df.columns) # 45, s/b 42?
+    NUM_GENES=len(expr_df.columns)
 
     print("+ save expression as a feather-formatted file")
     expr_df.reset_index().to_feather(f"{SAVE_PATH}/expr.ftr")
@@ -192,31 +201,6 @@ class Gtex(tfds.core.GeneratorBasedBuilder):
     TISSUE_LIST=set(attr_df["SMTS"])
     print(f"++ Class names set: {TISSUE_LIST}")
 
-    '''
-    # write attributes as csv -- remove this? xxx
-    attr_df[["SAMPID","SMTS"]].to_csv(f"{SAVE_PATH}/sample_id-superclass_name.tsv", sep="\t", index=False, header=False)
-
-    # -- remove this? xxx
-    print("+ Create dir structure for classes")
-    os.makedirs(f'data/gtex', exist_ok=True)
-    #class_names=TISSUE_LIST
-    for cls in class_names:
-      os.makedirs(f"data/gtex/{cls}",exist_ok=True)
-
-    print(f"+ Create a numpy for each row, write to data/gtex, separate out later")
-    import gzip
-    import numpy as np
-    for idx, nparray in enumerate(np.array(expr_df.iloc[:])):
-        nparray=nparray.astype(np.float16)
-        sample_id=expr_df.index[idx]
-        cls=attr_df.loc[attr_df["SAMPID"]==sample_id, "SMTS"].iloc[0]
-        if g_write_df:
-            with gzip.GzipFile(f"data/gtex/{cls}/{sample_id}.npy.gz", "w") as f:
-                np.save(file=f, arr=nparray)
-        else:
-              print(f"Didn't write {sample_id}.py.gz.")
-
-    '''
     strat = attr_df.set_index('SAMPID').reindex(expr_df.index).SMTS
     tissuetype_count_df = (
         pd.DataFrame(strat.value_counts())
