@@ -24,7 +24,7 @@ testpath
 typeguard
 scikit-learn
 feather-format
-kaleido
+python-kaleido
 scikit-learn
 pyarrow
 statsmodels
