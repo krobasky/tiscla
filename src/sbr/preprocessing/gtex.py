@@ -1,8 +1,64 @@
-import pandas as pd
 import tensorflow as tf
+import tensorflow_datasets as tfds
+from sbr.datasets.structured import gtex
+import pandas as pd
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
-def dataset_setup(sample_count_threshold=100,
+
+def dataset_setup(sample_count_threshold=500, test_fraction = 0.1, validation_fraction = 0.1, verbose = True, batch_size = 32, seed = None):
+    ###
+    # Retrieve and prep the data
+    ###
+
+    # load X, y, class_names
+    ds, info = tfds.load("gtex", split="train", with_info = True, as_supervised=True)
+    l=list(iter(ds.take(info.splits['train'].num_examples)))
+    X, y = map(np.array, zip(*l))
+    class_names=np.array(info.features['target'].names)
+
+    # xxx If you're going to drop anything, do it here (and adjust class_names):
+    import pandas as pd
+    counts={}
+    y_class_names=pd.DataFrame([class_names[c] for c in y])
+    for label in class_names:
+        count = y_class_names[y_class_names[0]==label].count().squeeze()
+        if sample_count_threshold is not None and count < sample_count_threshold:
+            print(f"too few: {label}({count})")
+        else:
+            counts[label]=count
+    print("Counts per class:")
+    print(f"(total number of samples, total number of genes) = \n{X.shape}")
+    for idx, (label, count) in enumerate(counts.items()):
+        print(f"[{idx:2}] {label:12}\t{count:4} samples")
+
+    # Normalize X and one-hot-encode y
+    X=np.log2(np.array(X)+1)
+    X=X/X.max()
+    y=tf.one_hot(y, len(class_names))
+
+    ### 
+    # Split the data
+    ###
+    batch_size=32
+    from sbr.preprocessing.dataset import multicategorical_split,  trim_list_size_to_batch_size_factor
+    # only select this many samples: SAMPLE_COUNT_THRESHOLD * len(class_names)
+    # but nothing is done here to balance them, so no classes are dropped here.
+    x_train, y_train, x_validation, y_validation, x_test, y_test = multicategorical_split(X, y, 
+                                                                                          sample_count_threshold = sample_count_threshold,
+                                                                                          test_fraction = test_fraction, 
+                                                                                          validation_fraction = validation_fraction,
+                                                                                          verbose=verbose, 
+                                                                                          batch_size=batch_size,
+                                                                                          seed=seed)
+
+    [x_train, y_train, x_validation, y_validation, x_test,y_test] = trim_list_size_to_batch_size_factor(batch_size, [x_train, y_train, 
+                                                                                                       x_validation, 
+                                                                                                       y_validation, 
+                                                                                                       x_test, y_test])
+    return [class_names, x_train, y_train, x_validation, y_validation, x_test,y_test]
+
+
+def dataset_setup_orig(sample_count_threshold=100,
                   expr_path = "data/gtex/expr.ftr",
                   attr_path = 'dist/gtex/GTEx_Analysis_v8_Annotations_SampleAttributesDS.txt',
                   drop_classes_list = None,
