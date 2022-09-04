@@ -11,10 +11,6 @@ This tissue classifier is trained on gene expression data from GTEx and can be u
   - [Install libraries](#install-libraries)
   - [Conda environment set-up](#conda-environment-set-up)
   - [Start notebook server](#start-notebook-server)
-- [Install data and other supporting apps](#install-data-and-other-supporting-apps)
-  - [CIFAR-10](#cifar-10)
-  - [GTEX](#gtex)
-- [Future](#future)
 
 ## Running apps
 
